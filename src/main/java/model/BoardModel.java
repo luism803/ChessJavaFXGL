@@ -23,7 +23,9 @@ public class BoardModel {
     private List<RecordMove> recordMoves;
     private Piece[] actualPieces;
 
-    public BoardModel(Vec2 puntero) {
+    private ClockModel clock;
+
+    public BoardModel(Vec2 puntero, double time) {
         this.puntero = puntero;
         showPuntero = true;
         promoting = false;
@@ -35,6 +37,7 @@ public class BoardModel {
         positions = new Vec2[3];
         actualPieces = new Piece[3];
         recordMoves = new ArrayList<>();
+        clock = new ClockModel(time);
         for (int x = 0; x < Constantes.squareNumber; x++) {
             for (int y = 0; y < Constantes.squareNumber; y++) {
                 squares[x][y] = new SquareModel(x, y);
@@ -43,8 +46,8 @@ public class BoardModel {
         colocarPiezas();
     }
 
-    public BoardModel() {
-        this(new Vec2());
+    public BoardModel(double time) {
+        this(new Vec2(), time);
     }
 
     public void updateObservers() {
@@ -53,10 +56,15 @@ public class BoardModel {
                 .forEach(e1 -> Arrays.stream(e1)
                         .toList()
                         .forEach(e2 -> e2.notifyObservers()));
+        clock.notifyObservers();
     }
 
-    public SquareModel[][] getSquareModels() {
+    public SquareModel[][] getSquare() {
         return squares;
+    }
+
+    public ClockModel getClock() {
+        return clock;
     }
 
     private int getCurrentTurn() {
@@ -319,7 +327,9 @@ public class BoardModel {
         }
     }
 
-    public void onUpdate() {
+    public void onUpdate(double tpf) {
+        if (recordMoves.size() > 1)
+            clock.decreaseTime(tpf, getCurrentTurn());
         updateObservers();
     }
 

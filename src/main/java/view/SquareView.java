@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import com.almasb.fxgl.dsl.FXGL;
 import javafx.scene.image.Image;
@@ -49,6 +49,5 @@ public class SquareView implements Observer {
         if (model.getPiece() != null)
             image.setImage(Constantes.getTile(model.getPiece().getPieza(), model.getPiece().getLado()));
         else image.setImage(null);
-
     }
 }

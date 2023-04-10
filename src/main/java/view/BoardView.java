@@ -1,15 +1,19 @@
-package View;
+package view;
 
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import model.ClockModel;
 import model.SquareModel;
 import utils.Constantes;
 
+import java.time.Clock;
+
 public class BoardView {
     private SquareView[][] squareViews;
+    private ClockView clockView;
 
-    public BoardView(SquareModel[][] squareModels) {
+    public BoardView(SquareModel[][] squareModels, ClockModel clockModel) {
         squareViews = new SquareView[Constantes.squareNumber][Constantes.squareNumber];
+        clockView = new ClockView(clockModel.timeToString(0));
         Color blanca = Color.web("rgb(250,220,175)");
         Color negra = Color.web("rgb(200,150,100)");
 
@@ -20,5 +24,7 @@ public class BoardView {
                 squareModels[x][y].addObserver(squareViews[x][y]);
             }
         }
+
+        clockModel.addObserver(clockView);
     }
 }

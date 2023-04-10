@@ -1,4 +1,4 @@
-import View.BoardView;
+import view.BoardView;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.core.math.Vec2;
@@ -36,8 +36,8 @@ public class Game extends GameApplication {
     }
 
     protected void initGame() {
-        boardModel = new BoardModel();
-        boardView = new BoardView(boardModel.getSquareModels());
+        boardModel = new BoardModel(3*60);
+        boardView = new BoardView(boardModel.getSquare(), boardModel.getClock());
     }
 
     @Override
@@ -80,7 +80,7 @@ public class Game extends GameApplication {
                         info.setCooldown(info.getCooldown() - tpf);
                 }
         );
-        boardModel.onUpdate();
+        boardModel.onUpdate(tpf);
     }
 
     public static void main(String[] args) {

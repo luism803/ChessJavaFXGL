@@ -10,6 +10,7 @@ public class Constantes {
     public static final int height = 600;
     public static final String tilesetURL = "C:\\Users\\paggi\\IdeaProjects\\demo\\src\\main\\resources\\img\\chessTileset.png";
 
+    public static final int heightClock = height/3;
     public static WritableImage getTile(int x, int y) {
         Image tileset = new Image(Constantes.tilesetURL);
 
