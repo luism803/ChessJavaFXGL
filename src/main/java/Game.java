@@ -5,8 +5,6 @@ import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
-import javafx.geometry.Point2D;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import model.BoardModel;
@@ -20,7 +18,6 @@ public class Game extends GameApplication {
     private BoardModel boardModel;
     private BoardView boardView;
     private Map<KeyCode, KeyInfo> keys;
-    private ImageView imageView;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -58,8 +55,6 @@ public class Game extends GameApplication {
                 }, code)
         );
         input.addAction(new UserAction("PRIMARY") {
-            Point2D mouse = input.getMousePositionWorld();
-
             @Override
             protected void onActionBegin() {
                 boardModel.seleccionarRaton(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()));

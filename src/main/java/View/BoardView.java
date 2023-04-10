@@ -8,10 +8,6 @@ import utils.Constantes;
 public class BoardView {
     private SquareView[][] squareViews;
 
-    public void prueba(int x, int y, Image image) {
-        squareViews[x][y].setPieceImage(image);
-    }
-
     public BoardView(SquareModel[][] squareModels) {
         squareViews = new SquareView[Constantes.squareNumber][Constantes.squareNumber];
         Color blanca = Color.web("rgb(250,220,175)");

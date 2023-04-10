@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BoardModel {
-    private boolean coronando;
-    private boolean mostrarPuntero;
-    private int ladoCoronacion;
+    private boolean promoting;
+    private boolean showPuntero;
+    private int ladoPromotion;
     private Vec2 puntero;
     private Vec2 seleccion;
-    private SquareModel[][] squareModels;
+    private SquareModel[][] squares;
     private SquareModel squareSelection;
     private Vec2[] positions;
     private List<Vec2> moves;
@@ -25,11 +25,11 @@ public class BoardModel {
 
     public BoardModel(Vec2 puntero) {
         this.puntero = puntero;
-        mostrarPuntero = true;
-        coronando = false;
-        ladoCoronacion = 0;
+        showPuntero = true;
+        promoting = false;
+        ladoPromotion = 0;
         seleccion = null;
-        squareModels = new SquareModel[Constantes.squareNumber][Constantes.squareNumber];
+        squares = new SquareModel[Constantes.squareNumber][Constantes.squareNumber];
         squareSelection = null;
         moves = new ArrayList<>();
         positions = new Vec2[3];
@@ -37,7 +37,7 @@ public class BoardModel {
         recordMoves = new ArrayList<>();
         for (int x = 0; x < Constantes.squareNumber; x++) {
             for (int y = 0; y < Constantes.squareNumber; y++) {
-                squareModels[x][y] = new SquareModel(x, y);
+                squares[x][y] = new SquareModel(x, y);
             }
         }
         colocarPiezas();
@@ -48,7 +48,7 @@ public class BoardModel {
     }
 
     public void updateObservers() {
-        Arrays.stream(squareModels)
+        Arrays.stream(squares)
                 .toList()
                 .forEach(e1 -> Arrays.stream(e1)
                         .toList()
@@ -56,16 +56,16 @@ public class BoardModel {
     }
 
     public SquareModel[][] getSquareModels() {
-        return squareModels;
+        return squares;
     }
 
     private int getCurrentTurn() {
         return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
     }
 
-    private Vec2 getRey(int lado) {
+    private Vec2 getKing(int lado) {
         AtomicReference<Vec2> res = new AtomicReference<>();
-        Arrays.stream(squareModels)
+        Arrays.stream(squares)
                 .toList()
                 .forEach(e1 -> Arrays.stream(e1)
                         .toList()
@@ -77,26 +77,26 @@ public class BoardModel {
     }
 
     public void back() {
-        if (!coronando && recordMoves.size() > 0) {
+        if (!promoting && recordMoves.size() > 0) {
             RecordMove lastRecord = recordMoves.get(recordMoves.size() - 1);
-            squareModels[(int) lastRecord.getOri().x][(int) lastRecord.getOri().y].setPiece(lastRecord.getPieceOri());
-            squareModels[(int) lastRecord.getDes().x][(int) lastRecord.getDes().y].setPiece(lastRecord.getPieceDes());
+            squares[(int) lastRecord.getOri().x][(int) lastRecord.getOri().y].setPiece(lastRecord.getPieceOri());
+            squares[(int) lastRecord.getDes().x][(int) lastRecord.getDes().y].setPiece(lastRecord.getPieceDes());
             recordMoves.remove(recordMoves.size() - 1);
             //SI HUBO PEON PASADO
             if (lastRecord.getPieceOri() instanceof Pawn && lastRecord.getPieceDes() == null
                     && lastRecord.getOri().x != lastRecord.getDes().x)
-                squareModels[(int) lastRecord.getDes().x][(int) lastRecord.getOri().y].setPiece(new Pawn(lastRecord.getPieceOri().getLado() * (-1) + 1));
+                squares[(int) lastRecord.getDes().x][(int) lastRecord.getOri().y].setPiece(new Pawn(lastRecord.getPieceOri().getLado() * (-1) + 1));
             //SI HUBO ENROQUE
             if (lastRecord.getPieceOri() instanceof King && Math.abs(lastRecord.getOri().x - lastRecord.getDes().x) == 2) {
                 //DERECHA
                 if (lastRecord.getOri().x - lastRecord.getDes().x < 0) {
-                    squareModels[(int) lastRecord.getDes().x + 1][(int) lastRecord.getDes().y].setPiece(new Rook(lastRecord.getPieceOri().getLado()));
-                    squareModels[(int) lastRecord.getDes().x - 1][(int) lastRecord.getDes().y].setPiece(null);
+                    squares[(int) lastRecord.getDes().x + 1][(int) lastRecord.getDes().y].setPiece(new Rook(lastRecord.getPieceOri().getLado()));
+                    squares[(int) lastRecord.getDes().x - 1][(int) lastRecord.getDes().y].setPiece(null);
                 }
                 //IZQUIERDA
                 else {
-                    squareModels[(int) lastRecord.getDes().x - 2][(int) lastRecord.getDes().y].setPiece(new Rook(lastRecord.getPieceOri().getLado()));
-                    squareModels[(int) lastRecord.getDes().x + 1][(int) lastRecord.getDes().y].setPiece(null);
+                    squares[(int) lastRecord.getDes().x - 2][(int) lastRecord.getDes().y].setPiece(new Rook(lastRecord.getPieceOri().getLado()));
+                    squares[(int) lastRecord.getDes().x + 1][(int) lastRecord.getDes().y].setPiece(null);
                 }
             }
         }
@@ -105,31 +105,43 @@ public class BoardModel {
     private void colocarPiezas() {
         //PAWNS
         for (int i = 0; i < 8; i++) {
-            squareModels[i][1].setPiece(new Pawn(1));
-            squareModels[i][6].setPiece(new Pawn(0));
+            squares[i][6].setPiece(new Pawn(0));
+            squares[i][1].setPiece(new Pawn(1));
         }
         //ROOKS
-        squareModels[7][7].setPiece(new Rook(0));
-        squareModels[0][7].setPiece(new Rook(0));
-        squareModels[7][0].setPiece(new Rook(1));
-        squareModels[0][0].setPiece(new Rook(1));
+        squares[7][7].setPiece(new Rook(0));
+        squares[0][7].setPiece(new Rook(0));
+        squares[7][0].setPiece(new Rook(1));
+        squares[0][0].setPiece(new Rook(1));
         //BISHOPS
-        squareModels[2][7].setPiece(new Bishop(0));
-        squareModels[5][7].setPiece(new Bishop(0));
-        squareModels[2][0].setPiece(new Bishop(1));
-        squareModels[5][0].setPiece(new Bishop(1));
+        squares[2][7].setPiece(new Bishop(0));
+        squares[5][7].setPiece(new Bishop(0));
+        squares[2][0].setPiece(new Bishop(1));
+        squares[5][0].setPiece(new Bishop(1));
         //KNIGHTS
-        squareModels[1][7].setPiece(new Knight(0));
-        squareModels[6][7].setPiece(new Knight(0));
-        squareModels[1][0].setPiece(new Knight(1));
-        squareModels[6][0].setPiece(new Knight(1));
+        squares[1][7].setPiece(new Knight(0));
+        squares[6][7].setPiece(new Knight(0));
+        squares[1][0].setPiece(new Knight(1));
+        squares[6][0].setPiece(new Knight(1));
         //QUEENS
-        squareModels[3][7].setPiece(new Queen(0));
-        squareModels[3][0].setPiece(new Queen(1));
+        squares[3][7].setPiece(new Queen(0));
+        squares[3][0].setPiece(new Queen(1));
         //KINGS
-        squareModels[4][7].setPiece(new King(0));
-        squareModels[4][0].setPiece(new King(1));
+        squares[4][7].setPiece(new King(0));
+        squares[4][0].setPiece(new King(1));
     }
+
+    private boolean detectChecks() {
+        if (!promoting) {
+            return isInCheck(getCurrentTurn());
+        } else
+            return false;
+    }
+
+//    private boolean detectCheck(int currentTurn) {
+//
+//        //return JugadasPosibles(currentTurn).Count == 0;
+//    }
 
     private void movePiece() { //se puede llamar a la funion copia
         movePiece(puntero, seleccion);
@@ -140,34 +152,35 @@ public class BoardModel {
         //GUARDAR JUGADA EN EL REGISTRO
         Piece pieceOri = null;
         Piece pieceDes = null;
-        if (squareModels[(int) ori.x][(int) ori.y].getPiece() != null)
-            pieceOri = squareModels[(int) ori.x][(int) ori.y].getPiece().copy();
-        if (squareModels[(int) des.x][(int) des.y].getPiece() != null)
-            pieceDes = squareModels[(int) des.x][(int) des.y].getPiece().copy();
+        if (squares[(int) ori.x][(int) ori.y].getPiece() != null)
+            pieceOri = squares[(int) ori.x][(int) ori.y].getPiece().copy();
+        if (squares[(int) des.x][(int) des.y].getPiece() != null)
+            pieceDes = squares[(int) des.x][(int) des.y].getPiece().copy();
         RecordMove recordMove = new RecordMove(ori, pieceOri, des, pieceDes);
         recordMoves.add(recordMove);
         //PEON PASADO
         if (recordMove.getPieceOri() instanceof Pawn && recordMove.getPieceDes() == null
                 && recordMove.getOri().x != recordMove.getDes().x)    //si el peon esta comiendo un peon pasado
-            squareModels[(int) recordMove.getDes().x][(int) recordMove.getOri().y].setPiece(null);  //quitar el peon comido
+            squares[(int) recordMove.getDes().x][(int) recordMove.getOri().y].setPiece(null);  //quitar el peon comido
         //ENROQUE
         if (recordMove.getPieceOri() instanceof King && Math.abs(recordMove.getOri().x - recordMove.getDes().x) == 2) { //si el rey se esta moviendo dos casillas a la derecha o izquierda
             if (recordMove.getOri().x - recordMove.getDes().x < 0) {  //DERECHA
-                squareModels[(int) recordMove.getDes().x + 1][(int) recordMove.getDes().y].setPiece(null);
-                squareModels[(int) recordMove.getDes().x - 1][(int) recordMove.getDes().y].setPiece(new Rook(recordMove.getPieceOri().getLado()));
+                squares[(int) recordMove.getDes().x + 1][(int) recordMove.getDes().y].setPiece(null);
+                squares[(int) recordMove.getDes().x - 1][(int) recordMove.getDes().y].setPiece(new Rook(recordMove.getPieceOri().getLado()));
             } else {  ////IZQUIERDA
-                squareModels[(int) recordMove.getDes().x - 2][(int) recordMove.getDes().y].setPiece(null);
-                squareModels[(int) recordMove.getDes().x + 1][(int) recordMove.getDes().y].setPiece(new Rook(recordMove.getPieceOri().getLado()));
+                squares[(int) recordMove.getDes().x - 2][(int) recordMove.getDes().y].setPiece(null);
+                squares[(int) recordMove.getDes().x + 1][(int) recordMove.getDes().y].setPiece(new Rook(recordMove.getPieceOri().getLado()));
             }
         }
         //MOVER
-        squareModels[(int) des.x][(int) des.y].setPiece(pieceOri);
-        squareModels[(int) ori.x][(int) ori.y].setPiece(null);
+        squares[(int) des.x][(int) des.y].setPiece(pieceOri);
+        squares[(int) ori.x][(int) ori.y].setPiece(null);
     }
 
     public void quitarSeleccion() {
         seleccion = null;
         squareSelection = null;
+        moves.clear();
     }
 
     public void seleccionar() { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
@@ -175,7 +188,7 @@ public class BoardModel {
     }
 
     private void seleccionar(Vec2 pos) { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
-        if (!coronando) {
+        if (!promoting) {
             //si hay seleccion
             if (seleccion != null && moves.stream().anyMatch(m -> m.equals(pos))) { //si se apunta hacia una casilla que es una jugada
                 puntero = pos.copy();
@@ -183,7 +196,7 @@ public class BoardModel {
             } else {
                 puntero = pos.copy();
                 seleccion = pos.copy();  //actualizar la seleccion (Vec2)
-                squareSelection = squareModels[(int) seleccion.x][(int) seleccion.y];  //actualizar la casilla de seleccion
+                squareSelection = squares[(int) seleccion.x][(int) seleccion.y];  //actualizar la casilla de seleccion
                 if (squareSelection.getPiece() == null               //si la casilla seleccionada esta vacia
                         || squareSelection.getPiece().getLado() != getCurrentTurn())    //o casilla seleccionada no es del color correspondiente
                     quitarSeleccion();
@@ -191,56 +204,74 @@ public class BoardModel {
 
         } else {    //se elige la pieza de coronacion
             if (Arrays.asList(positions).contains(pos) ||   //la pieza seleccionada este en una de las positions guardadas
-            pos.equals(new Vec2(positions[0].x, positions[0].y * 2 - positions[1].y)))
-            {   //la pieza seleccionada es la reina
-                squareModels[(int)positions[0].x][(int)(positions[0].y * 2 - positions[1].y)].setPiece(squareModels[(int)pos.x][(int)pos.y].getPiece());
-                squareModels[(int)positions[0].x][(int)positions[0].y].setPiece(actualPieces[0]);
-                squareModels[(int)positions[1].x][(int)positions[1].y].setPiece(actualPieces[1]);
-                squareModels[(int)positions[2].x][(int)positions[2].y].setPiece(actualPieces[2]);
-                coronando = false;
+                    pos.equals(new Vec2(positions[0].x, positions[0].y * 2 - positions[1].y))) {   //la pieza seleccionada es la reina
+                squares[(int) positions[0].x][(int) (positions[0].y * 2 - positions[1].y)].setPiece(squares[(int) pos.x][(int) pos.y].getPiece());
+                squares[(int) positions[0].x][(int) positions[0].y].setPiece(actualPieces[0]);
+                squares[(int) positions[1].x][(int) positions[1].y].setPiece(actualPieces[1]);
+                squares[(int) positions[2].x][(int) positions[2].y].setPiece(actualPieces[2]);
+                promoting = false;
             }
         }
         //CORONACION
-        Vec2 pawnPromoted = isPawnPromotionPossible();
+        Vec2 pawnPromoted = pawnPromoted();
         if (pawnPromoted != null) {
-            coronando = true;
+            promoting = true;
             elegirCoronacion(pawnPromoted);
         }
-        //save moves
-        if (!coronando)
+        //update moves
+        if (!promoting)
             moves.clear();    //vaciar las moves posibles
         if (seleccion != null) {    //si hay seleccionada una casilla
-            if (squareModels[(int) seleccion.x][(int) seleccion.y].getPiece() != null) { //si hay una ficha en la casilla seleccionada
-                moves = squareModels[(int) seleccion.x][(int) seleccion.y].getPiece().calculateMoves(this, seleccion, true);  //guardar las moves posibles de esa jugada
+            if (squares[(int) seleccion.x][(int) seleccion.y].getPiece() != null) { //si hay una ficha en la casilla seleccionada
+                moves = squares[(int) seleccion.x][(int) seleccion.y].getPiece().calculateMoves(this, seleccion, true);  //guardar las moves posibles de esa jugada
             }
+        }
+        //update squares color
+        Arrays.stream(squares)
+                .toList()
+                .forEach(e1 -> Arrays.stream(e1)
+                        .toList()
+                        .forEach(e2 -> {
+                            e2.setPuntero(showPuntero && e2.getPos().equals(puntero));
+                            e2.setSeleccion(e2.getPos().equals(seleccion));
+                            e2.setJugada((e2.getPiece() instanceof King && e2.getPiece().getLado() == getCurrentTurn() && isInCheck(getCurrentTurn()))
+                                    || moves.stream()
+                                    .anyMatch(m -> m.equals(e2.getPos())));
+                        }));
+        //CHECK STATUS GAME
+        if (posiblesMoves(getCurrentTurn()).size() == 0) {
+            if (detectChecks())
+                System.out.println(((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS!!!");
+            else
+                System.out.println("STALE MATE");
         }
     }
 
     private void elegirCoronacion(Vec2 pawnPromoted) {
-        ladoCoronacion = 0;
+        ladoPromotion = 0;
         //blancas
-        if (squareModels[(int) pawnPromoted.x][(int) pawnPromoted.y].getPiece().getLado() == 0) {
+        if (squares[(int) pawnPromoted.x][(int) pawnPromoted.y].getPiece().getLado() == 0) {
             //posiciones
             positions[0] = new Vec2(pawnPromoted.x, pawnPromoted.y + 1);
             positions[1] = new Vec2(pawnPromoted.x, pawnPromoted.y + 2);
             positions[2] = new Vec2(pawnPromoted.x, pawnPromoted.y + 3);
-            ladoCoronacion = 0;
+            ladoPromotion = 0;
         } else {
             //positions
             positions[0] = new Vec2(pawnPromoted.x, pawnPromoted.y - 1);
             positions[1] = new Vec2(pawnPromoted.x, pawnPromoted.y - 2);
             positions[2] = new Vec2(pawnPromoted.x, pawnPromoted.y - 3);
-            ladoCoronacion = 1;
+            ladoPromotion = 1;
         }
         //guardar fichas actuales
-        actualPieces[0] = squareModels[(int) positions[0].x][(int) positions[0].y].getPiece();
-        actualPieces[1] = squareModels[(int) positions[1].x][(int) positions[1].y].getPiece();
-        actualPieces[2] = squareModels[(int) positions[2].x][(int) positions[2].y].getPiece();
+        actualPieces[0] = squares[(int) positions[0].x][(int) positions[0].y].getPiece();
+        actualPieces[1] = squares[(int) positions[1].x][(int) positions[1].y].getPiece();
+        actualPieces[2] = squares[(int) positions[2].x][(int) positions[2].y].getPiece();
         //Mostrar opciones
-        squareModels[(int) pawnPromoted.x][(int) pawnPromoted.y].setPiece(new Queen(ladoCoronacion));
-        squareModels[(int) positions[0].x][(int) positions[0].y].setPiece(new Knight(ladoCoronacion));
-        squareModels[(int) positions[1].x][(int) positions[1].y].setPiece(new Rook(ladoCoronacion));
-        squareModels[(int) positions[2].x][(int) positions[2].y].setPiece(new Bishop(ladoCoronacion));
+        squares[(int) pawnPromoted.x][(int) pawnPromoted.y].setPiece(new Queen(ladoPromotion));
+        squares[(int) positions[0].x][(int) positions[0].y].setPiece(new Knight(ladoPromotion));
+        squares[(int) positions[1].x][(int) positions[1].y].setPiece(new Rook(ladoPromotion));
+        squares[(int) positions[2].x][(int) positions[2].y].setPiece(new Bishop(ladoPromotion));
         //añadir opciones a jugadas
         moves.add(pawnPromoted);
         moves.add(positions[0]);
@@ -248,9 +279,9 @@ public class BoardModel {
         moves.add(positions[2]);
     }
 
-    private Vec2 isPawnPromotionPossible() {
+    private Vec2 pawnPromoted() {
         AtomicReference<Vec2> res = new AtomicReference<>();
-        Arrays.stream(squareModels)
+        Arrays.stream(squares)
                 .toList()
                 .forEach(e1 -> Arrays.stream(e1)
                         .toList()
@@ -261,13 +292,26 @@ public class BoardModel {
         return res.get();
     }
 
+    private List<Vec2> posiblesMoves(int lado) {
+        List<Vec2> moves = new ArrayList<>();
+        Arrays.stream(squares)
+                .toList()
+                .forEach(e1 -> Arrays.stream(e1)
+                        .toList()
+                        .forEach(square -> {
+                            if (square.getPiece() != null && square.getPiece().getLado() == lado)
+                                moves.addAll(square.getPiece().calculateMoves(this, square.getPos(), true));
+                        }));
+        return moves;
+    }
+
     public void seleccionarRaton(Vec2 pos) {
         seleccionarRaton(pos, true);
     }
 
     public void seleccionarRaton(Vec2 pos, boolean normal) {
-        if (normal || !coronando) {
-            mostrarPuntero = false;
+        if (normal || !promoting) {
+            showPuntero = false;
             //ajustar posicion raton
             Vec2 posRaton = new Vec2((int) (pos.x / (Constantes.height / Constantes.squareNumber)), (int) (pos.y / (Constantes.height / Constantes.squareNumber)));
             if (isInside(posRaton))
@@ -276,45 +320,34 @@ public class BoardModel {
     }
 
     public void onUpdate() {
-        //update squares color
-        Arrays.stream(squareModels)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(e2 -> {
-                            e2.setPuntero(mostrarPuntero && e2.getPos().equals(puntero));
-                            e2.setSeleccion(e2.getPos().equals(seleccion));
-                            e2.setJugada(moves.stream()
-                                    .anyMatch(m -> m.equals(e2.getPos())));
-                        }));
         updateObservers();
     }
 
     public void goUp() {
-        mostrarPuntero = true;
-        if (!coronando && puntero.y > 0
-                || puntero.y > 4 && ladoCoronacion == 1
-                || puntero.y > 0 && ladoCoronacion == 0)
+        showPuntero = true;
+        if (!promoting && puntero.y > 0
+                || puntero.y > 4 && ladoPromotion == 1
+                || puntero.y > 0 && ladoPromotion == 0)
             puntero.y--;
     }
 
     public void goDown() {
-        mostrarPuntero = true;
-        if (!coronando && puntero.y < Constantes.squareNumber - 1
-                || coronando && puntero.y < Constantes.squareNumber - 1 - 4 && ladoCoronacion == 0
-                || coronando && puntero.y < Constantes.squareNumber - 1 && ladoCoronacion == 1)
+        showPuntero = true;
+        if (!promoting && puntero.y < Constantes.squareNumber - 1
+                || promoting && puntero.y < Constantes.squareNumber - 1 - 4 && ladoPromotion == 0
+                || promoting && puntero.y < Constantes.squareNumber - 1 && ladoPromotion == 1)
             puntero.y++;
     }
 
     public void goLeft() {
-        mostrarPuntero = true;
-        if (puntero.x > 0 && !coronando)
+        showPuntero = true;
+        if (puntero.x > 0 && !promoting)
             puntero.x--;
     }
 
     public void goRight() {
-        mostrarPuntero = true;
-        if (puntero.x < Constantes.squareNumber - 1 && !coronando)
+        showPuntero = true;
+        if (puntero.x < Constantes.squareNumber - 1 && !promoting)
             puntero.x++;
     }
 
@@ -328,20 +361,20 @@ public class BoardModel {
     }
 
     public boolean isPeon(Vec2 pos) {
-        return isInside(pos) && squareModels[(int) pos.x][(int) pos.y].getPiece() instanceof Pawn;
+        return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() instanceof Pawn;
     }
 
     public boolean isEmpty(Vec2 pos) {
-        return isInside(pos) && squareModels[(int) pos.x][(int) pos.y].getPiece() == null;
+        return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() == null;
     }
 
     public boolean isEnemy(Vec2 pos, int lado) {
-        return isInside(pos) && squareModels[(int) pos.x][(int) pos.y].getPiece() != null &&
-                squareModels[(int) pos.x][(int) pos.y].getPiece().getLado() != lado;
+        return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() != null &&
+                squares[(int) pos.x][(int) pos.y].getPiece().getLado() != lado;
     }
 
     public boolean isInCheck(int lado) {
-        return isAtacked(getRey(lado), lado);
+        return isAtacked(getKing(lado), lado);
     }
 
     public boolean isLastJugada(Vec2 origin, Vec2 destination) {
@@ -350,7 +383,7 @@ public class BoardModel {
 
     public boolean isAtacked(Vec2 pos, int lado) {
         List<Vec2> atacks = new ArrayList<Vec2>();
-        Arrays.stream(squareModels)
+        Arrays.stream(squares)
                 .toList()
                 .forEach(e1 -> Arrays.stream(e1)
                         .toList()
