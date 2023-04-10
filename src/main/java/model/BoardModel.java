@@ -68,7 +68,9 @@ public class BoardModel {
     }
 
     private int getCurrentTurn() {
-        return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
+        if(promoting) {
+            return ladoPromotion;
+        }return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
     }
 
     private Vec2 getKing(int lado) {
@@ -247,7 +249,7 @@ public class BoardModel {
                                     .anyMatch(m -> m.equals(e2.getPos())));
                         }));
         //CHECK STATUS GAME
-        if (posiblesMoves(getCurrentTurn()).size() == 0) {
+        if (!promoting && posiblesMoves(getCurrentTurn()).size() == 0) {
             if (detectChecks())
                 System.out.println(((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS!!!");
             else
