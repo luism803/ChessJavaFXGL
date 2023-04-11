@@ -68,9 +68,10 @@ public class BoardModel {
     }
 
     private int getCurrentTurn() {
-        if(promoting) {
+        if (promoting) {
             return ladoPromotion;
-        }return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
+        }
+        return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
     }
 
     private Vec2 getKing(int lado) {
@@ -337,38 +338,38 @@ public class BoardModel {
 
     public void goUp() {
         showPuntero = true;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
         if (!promoting && puntero.y > 0
                 || puntero.y > 4 && ladoPromotion == 1
                 || puntero.y > 0 && ladoPromotion == 0)
             puntero.y--;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
     }
 
     public void goDown() {
         showPuntero = true;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
         if (!promoting && puntero.y < Constantes.squareNumber - 1
                 || promoting && puntero.y < Constantes.squareNumber - 1 - 4 && ladoPromotion == 0
                 || promoting && puntero.y < Constantes.squareNumber - 1 && ladoPromotion == 1)
             puntero.y++;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
     }
 
     public void goLeft() {
         showPuntero = true;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
         if (puntero.x > 0 && !promoting)
             puntero.x--;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
     }
 
     public void goRight() {
         showPuntero = true;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
         if (puntero.x < Constantes.squareNumber - 1 && !promoting)
             puntero.x++;
-        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
+        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
     }
 
     public boolean wasMoved(Vec2 pos) {

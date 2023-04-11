@@ -5,7 +5,6 @@ import model.ClockModel;
 import model.SquareModel;
 import utils.Constantes;
 
-import java.time.Clock;
 import java.util.Arrays;
 
 public class BoardView {
@@ -28,11 +27,13 @@ public class BoardView {
 
         clockModel.addObserver(clockView);
     }
-    public void setOpacity(int opacity){
-        Arrays.stream(squareViews).toList().forEach(e1 -> Arrays.stream(e1).toList().forEach(e2->e2.setOpacity(opacity)));
+
+    public void setOpacity(int opacity) {
+        Arrays.stream(squareViews).toList().forEach(e1 -> Arrays.stream(e1).toList().forEach(e2 -> e2.setOpacity(opacity)));
         clockView.setOpacity(opacity);
     }
-    public void setOpacity(boolean opacity){
-        setOpacity(opacity?0:1);
+
+    public void setOpacity(boolean opacity) {
+        setOpacity(opacity ? 0 : 1);
     }
 }

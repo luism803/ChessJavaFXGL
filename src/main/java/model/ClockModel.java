@@ -3,6 +3,7 @@ package model;
 import java.util.Observable;
 
 public class ClockModel extends Observable {
+    boolean run;
     private double[] playersTimes;
 
     public double[] getPlayersTimes() {
@@ -13,11 +14,19 @@ public class ClockModel extends Observable {
         playersTimes = new double[2];
         playersTimes[0] = time;
         playersTimes[1] = time;
+        run = true;
     }
 
-    public void decreaseTime(double tpf, int lado) {
-        playersTimes[lado] -= tpf;
-        setChanged();
+    public boolean decreaseTime(double tpf, int lado) {
+        if (run) {
+            playersTimes[lado] -= tpf;
+            setChanged();
+        }
+        if (playersTimes[lado] <= 0) {
+            stop();
+            return true;
+        }
+        return false;
     }
 
     public String timeToString(int lado) {
@@ -29,8 +38,14 @@ public class ClockModel extends Observable {
     }
 
     public void setTime(int time) {
-        playersTimes[0] = time;
-        playersTimes[1] = time;
-        setChanged();
+        if (run) {
+            playersTimes[0] = time;
+            playersTimes[1] = time;
+            setChanged();
+        }
+    }
+
+    public void stop() {
+        run = false;
     }
 }

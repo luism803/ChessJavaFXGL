@@ -11,6 +11,7 @@ import model.MenuModel;
 import structs.KeyInfo;
 import utils.Constantes;
 import view.BoardView;
+import view.MenuView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class GameController {
     private BoardModel boardModel;
     private BoardView boardView;
     private MenuModel menuModel;
+    private MenuView menuView;
     private Map<KeyCode, KeyInfo> keys;
     private int mode;
     private int time;
@@ -42,11 +44,15 @@ public class GameController {
                 boardModel.goRight();
         }));
         keys.put(KeyCode.UP, new KeyInfo("UP", () -> {
-            if (mode == 1)
+            if (mode == 0)
+                menuModel.increaseTime();
+            else if (mode == 1)
                 boardModel.goUp();
         }));
         keys.put(KeyCode.DOWN, new KeyInfo("DOWN", () -> {
-            if (mode == 1)
+            if (mode == 0)
+                menuModel.decreaseTime();
+            else if (mode == 1)
                 boardModel.goDown();
         }));
         keys.put(KeyCode.SPACE, new KeyInfo("SPACE", () -> {
@@ -54,11 +60,12 @@ public class GameController {
                 boardModel.quitarSeleccion();
         }));
         keys.put(KeyCode.ENTER, new KeyInfo("ENTER", () -> {
-            if(mode == 0) {
+            if (mode == 0) {
                 boardModel.setTime(menuModel.enter());
+                menuView.setOpacity(true);
                 boardView.setOpacity(false);
                 mode = 1;
-            }if (mode == 1)
+            } else if (mode == 1)
                 boardModel.seleccionar();
         }));
         keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> {
@@ -72,7 +79,9 @@ public class GameController {
     }
 
     private void initGame() {
-        menuModel = new MenuModel();
+        menuModel = new MenuModel(180);
+        menuView = new MenuView(menuModel.timeToString());
+        menuModel.addObserver(menuView);
         boardModel = new BoardModel(0);
         boardView = new BoardView(boardModel.getSquare(), boardModel.getClock());
     }

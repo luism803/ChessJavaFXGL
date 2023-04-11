@@ -2,7 +2,6 @@ package view;
 
 import com.almasb.fxgl.dsl.FXGL;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -20,20 +19,20 @@ public class ClockView implements Observer {
         timePlayer1 = new Text();
         timePlayer1.setText(time);
         timePlayer1.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-        timePlayer1.setFill(Color.WHITE);
-        int width = (int)timePlayer1.getLayoutBounds().getWidth();
-        int height = (int)timePlayer1.getLayoutBounds().getHeight();
+        timePlayer1.setFill(Color.GREY);
+        int width = (int) timePlayer1.getLayoutBounds().getWidth();
+        int height = (int) timePlayer1.getLayoutBounds().getHeight();
         FXGL.entityBuilder()
                 .view(timePlayer1)
-                .at((Constantes.width/2+ Constantes.height/2)-width/2, Constantes.heightClock-height/2)
+                .at((Constantes.width / 2 + Constantes.height / 2) - width / 2, Constantes.heightClock + (3 * height) / 8)
                 .buildAndAttach();
         timePlayer0 = new Text();
         timePlayer0.setText(time);
         timePlayer0.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-        timePlayer0.setFill(Color.WHITE);
+        timePlayer0.setFill(Color.GREY);
         FXGL.entityBuilder()
                 .view(timePlayer0)
-                .at((Constantes.width/2+ Constantes.height/2)-width/2, Constantes.height - Constantes.heightClock)
+                .at((Constantes.width / 2 + Constantes.height / 2) - width / 2, Constantes.height - Constantes.heightClock + (3 * height) / 8)
                 .buildAndAttach();
     }
 

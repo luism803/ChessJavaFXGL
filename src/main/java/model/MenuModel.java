@@ -1,26 +1,42 @@
 package model;
 
-import com.almasb.fxgl.dsl.FXGL;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import utils.Constantes;
 
-public class MenuModel {
-    Rectangle rect;
-    public MenuModel() {
-        rect = new Rectangle(Constantes.width, Constantes.height, Color.BLACK);
-        FXGL.entityBuilder().view(rect).buildAndAttach();
+import java.util.Observable;
+
+public class MenuModel extends Observable {
+    int time;
+
+    public MenuModel(int time) {
+        this.time = time;
     }
 
-    public int enter(){
-        return 3*60;
+    public int enter() {
+        return time;
     }
 
-    public void setOpacity(int opacity){
-        rect.setOpacity(opacity);
+    public boolean increaseTime() {
+        return setTime(time + 30);
     }
 
-    public void setOpacity(boolean opacity){
-        setOpacity(opacity?0:1);
+    public boolean decreaseTime() {
+        return setTime(time - 30);
+    }
+
+    public boolean setTime(int time) {
+        if (time >= 30 && time <= Constantes.maxTime)
+            this.time = time;
+        if (this.time == time) {
+            setChanged();
+            notifyObservers();
+            return true;
+        }
+        return false;
+    }
+
+    public String timeToString() {
+        int minutes = time / 60;
+        int seconds = time % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 }
