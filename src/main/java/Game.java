@@ -1,3 +1,7 @@
+import controller.GameController;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import view.BoardView;
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
@@ -15,72 +19,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Game extends GameApplication {
-    private BoardModel boardModel;
-    private BoardView boardView;
-    private Map<KeyCode, KeyInfo> keys;
+
+    private GameController gameController;
 
     @Override
     protected void initSettings(GameSettings settings) {
         settings.setWidth(Constantes.width);
         settings.setHeight(Constantes.height);
         settings.setTicksPerSecond(60);
-        keys = new HashMap<KeyCode, KeyInfo>();
-        keys.put(KeyCode.LEFT, new KeyInfo("LEFT", () -> boardModel.goLeft()));
-        keys.put(KeyCode.RIGHT, new KeyInfo("RIGHT", () -> boardModel.goRight()));
-        keys.put(KeyCode.UP, new KeyInfo("UP", () -> boardModel.goUp()));
-        keys.put(KeyCode.DOWN, new KeyInfo("DOWN", () -> boardModel.goDown()));
-        keys.put(KeyCode.SPACE, new KeyInfo("SPACE", () -> boardModel.quitarSeleccion()));
-        keys.put(KeyCode.ENTER, new KeyInfo("ENTER", () -> boardModel.seleccionar()));
-        keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> boardModel.back()));
-        keys.put(KeyCode.TAB, new KeyInfo("TAB", () -> boardModel.back()));
     }
 
     protected void initGame() {
-        boardModel = new BoardModel(3*60);
-        boardView = new BoardView(boardModel.getSquare(), boardModel.getClock());
+        gameController = new GameController();
     }
 
     @Override
     protected void initInput() {
-        Input input = FXGL.getInput();
-        keys.forEach((code, info) ->
-                input.addAction(new UserAction(info.getName()) {
-                    @Override
-                    protected void onAction() {
-                        if (info.getCooldown() <= 0) {
-                            info.getAccion().run();
-                            info.setCooldown(Constantes.cooldown);
-                        }
-                    }
-                }, code)
-        );
-        input.addAction(new UserAction("PRIMARY") {
-            @Override
-            protected void onActionBegin() {
-                boardModel.seleccionarRaton(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()));
-            }
-
-            @Override
-            protected void onActionEnd() {
-                boardModel.seleccionarRaton(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()), false);
-            }
-        }, MouseButton.PRIMARY);
-        input.addAction(new UserAction("SECONDARY") {
-            @Override
-            protected void onActionBegin() {
-                boardModel.quitarSeleccion();
-            }
-        }, MouseButton.SECONDARY);
+//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure do you want to close?");
+//        alert.showAndWait().ifPresent(response -> {
+//            if (response == ButtonType.OK) {
+//                Platform.exit();
+//            }
+//        });
     }
 
     @Override
     protected void onUpdate(double tpf) {
-        keys.forEach((code, info) -> {
-                    if (info.getCooldown() > 0)
-                        info.setCooldown(info.getCooldown() - tpf);
-                }
-        );
-        boardModel.onUpdate(tpf);
+        gameController.onUpdate(tpf);
     }
 
     public static void main(String[] args) {

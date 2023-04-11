@@ -17,12 +17,13 @@ public class SquareView implements Observer {
     static Color seleccionColor = Color.web("rgb(120, 120, 120)", 1.0);
     static Color ataqueColor = Color.web("rgb(255, 50, 0)", 0.75);
     private Rectangle rectFiltro;
+    private Rectangle rectBase;
     private ImageView image;
 
     public SquareView(double x, double y, double size, Color baseColor) {
         x *= size;
         y *= size;
-        Rectangle rectBase = new Rectangle(size, size, baseColor);
+        rectBase = new Rectangle(size, size, baseColor);
         rectFiltro = new Rectangle(size, size, Color.color(0, 0, 0, 0));
         image = new ImageView();
         image.setFitHeight(Constantes.height / Constantes.squareNumber);
@@ -49,5 +50,11 @@ public class SquareView implements Observer {
         if (model.getPiece() != null)
             image.setImage(Constantes.getTile(model.getPiece().getPieza(), model.getPiece().getLado()));
         else image.setImage(null);
+    }
+
+    public void setOpacity(int opacity) {
+        rectBase.setOpacity(opacity);
+        rectFiltro.setOpacity(opacity);
+        image.setOpacity(opacity);
     }
 }

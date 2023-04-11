@@ -337,30 +337,38 @@ public class BoardModel {
 
     public void goUp() {
         showPuntero = true;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
         if (!promoting && puntero.y > 0
                 || puntero.y > 4 && ladoPromotion == 1
                 || puntero.y > 0 && ladoPromotion == 0)
             puntero.y--;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
     }
 
     public void goDown() {
         showPuntero = true;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
         if (!promoting && puntero.y < Constantes.squareNumber - 1
                 || promoting && puntero.y < Constantes.squareNumber - 1 - 4 && ladoPromotion == 0
                 || promoting && puntero.y < Constantes.squareNumber - 1 && ladoPromotion == 1)
             puntero.y++;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
     }
 
     public void goLeft() {
         showPuntero = true;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
         if (puntero.x > 0 && !promoting)
             puntero.x--;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
     }
 
     public void goRight() {
         showPuntero = true;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(false);
         if (puntero.x < Constantes.squareNumber - 1 && !promoting)
             puntero.x++;
+        squares[(int)puntero.x][(int)puntero.y].setPuntero(true);
     }
 
     public boolean wasMoved(Vec2 pos) {
@@ -404,5 +412,9 @@ public class BoardModel {
                                 atacks.addAll(square.getPiece().calculateMoves(this, square.getPos(), false));
                         }));
         return atacks.stream().anyMatch(a -> a.equals(pos));
+    }
+
+    public void setTime(int time) {
+        clock.setTime(time);
     }
 }

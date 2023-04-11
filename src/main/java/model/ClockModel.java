@@ -27,4 +27,10 @@ public class ClockModel extends Observable {
         int hundredths = (int) (((time % 60) - seconds) * 100);
         return String.format("%02d:%02d:%02d", minutes, seconds, hundredths);
     }
+
+    public void setTime(int time) {
+        playersTimes[0] = time;
+        playersTimes[1] = time;
+        setChanged();
+    }
 }
