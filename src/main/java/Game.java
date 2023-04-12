@@ -20,12 +20,6 @@ public class Game extends GameApplication {
 
     @Override
     protected void initInput() {
-//        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure do you want to close?");
-//        alert.showAndWait().ifPresent(response -> {
-//            if (response == ButtonType.OK) {
-//                Platform.exit();
-//            }
-//        });
     }
 
     @Override

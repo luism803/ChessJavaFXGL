@@ -18,7 +18,7 @@ public class ClockView implements Observer {
     public ClockView(String time) {
         timePlayer1 = new Text(time);
         timePlayer1.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-        timePlayer1.setFill(Color.GREY);
+        timePlayer1.setFill(Color.BLACK);
         int width = (int) timePlayer1.getLayoutBounds().getWidth();
         int height = (int) timePlayer1.getLayoutBounds().getHeight();
         FXGL.entityBuilder()
@@ -27,7 +27,7 @@ public class ClockView implements Observer {
                 .buildAndAttach();
         timePlayer0 = new Text(time);
         timePlayer0.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-        timePlayer0.setFill(Color.GREY);
+        timePlayer0.setFill(Color.BLACK);
         FXGL.entityBuilder()
                 .view(timePlayer0)
                 .at((Constantes.width / 2 + Constantes.height / 2) - width / 2, Constantes.height - Constantes.heightClock + (3 * height) / 8)

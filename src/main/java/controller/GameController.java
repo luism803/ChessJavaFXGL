@@ -68,6 +68,7 @@ public class GameController {
             } else if (mode == 1)
                 boardModel.select();
         }));
+
 //        keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> {
 //            if (mode == 1)
 //                boardModel.back();

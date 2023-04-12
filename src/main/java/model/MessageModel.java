@@ -2,7 +2,7 @@ package model;
 
 import java.util.Observable;
 
-public class MessageModel extends Observable{
+public class MessageModel extends Observable {
     private String message;
 
     public MessageModel() {
@@ -10,7 +10,7 @@ public class MessageModel extends Observable{
     }
 
     public String getMessage() {
-        System.out.println("->"+message); return message;
+        return message;
     }
 
     public void setMessage(String message) {

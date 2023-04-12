@@ -85,7 +85,7 @@ public class BoardModel {
     }
 
     private String getFinalMessage() {
-        if(!clock.isRun())
+        if (!clock.isRun())
             return ((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS";
         if (detectChecks())
             return ((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS";
@@ -240,7 +240,8 @@ public class BoardModel {
             }
         }
         //update squares color
-        Arrays.stream(squares).flatMap(Arrays::stream)
+        Arrays.stream(squares)
+                .flatMap(Arrays::stream)
                 .forEach(square -> {
                     square.setPuntero(showPuntero && square.getPos().equals(puntero));
                     square.setSeleccion(square.getPos().equals(seleccion));
@@ -326,7 +327,6 @@ public class BoardModel {
     public void onUpdate(double tpf) {
         if (!gameFinished && recordMoves.size() > 1 && clock.decreaseTime(tpf, getCurrentTurn())) {
             gameFinished = true;
-            System.out.println("asdfasdf");
             message.setMessage(getFinalMessage());
         }
         updateObservers();
