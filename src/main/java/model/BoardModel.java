@@ -8,27 +8,30 @@ import utils.Constantes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BoardModel {
     private boolean promoting;
     private boolean showPuntero;
+    private boolean gameFinished;
     private int ladoPromotion;
     private Vec2 puntero;
     private Vec2 seleccion;
-    private SquareModel[][] squares;
-    private SquareModel squareSelection;
     private Vec2[] positions;
     private List<Vec2> moves;
     private List<RecordMove> recordMoves;
     private Piece[] actualPieces;
-
+    private SquareModel[][] squares;
+    private SquareModel squareSelection;
     private ClockModel clock;
+    private MessageModel message;
 
     public BoardModel(Vec2 puntero, double time) {
         this.puntero = puntero;
         showPuntero = true;
         promoting = false;
+        gameFinished = false;
         ladoPromotion = 0;
         seleccion = null;
         squares = new SquareModel[Constantes.squareNumber][Constantes.squareNumber];
@@ -38,25 +41,17 @@ public class BoardModel {
         actualPieces = new Piece[3];
         recordMoves = new ArrayList<>();
         clock = new ClockModel(time);
+        message = new MessageModel();
         for (int x = 0; x < Constantes.squareNumber; x++) {
             for (int y = 0; y < Constantes.squareNumber; y++) {
                 squares[x][y] = new SquareModel(x, y);
             }
         }
-        colocarPiezas();
+        placePieces();
     }
 
     public BoardModel(double time) {
         this(new Vec2(), time);
-    }
-
-    public void updateObservers() {
-        Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(e2 -> e2.notifyObservers()));
-        clock.notifyObservers();
     }
 
     public SquareModel[][] getSquare() {
@@ -74,17 +69,28 @@ public class BoardModel {
         return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
     }
 
+    public MessageModel getMessage() {
+        return message;
+    }
+
     private Vec2 getKing(int lado) {
         AtomicReference<Vec2> res = new AtomicReference<>();
         Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(square -> {
-                            if (!isEnemy(square.getPos(), lado) && square.getPiece() instanceof King)
-                                res.set(square.getPos());
-                        }));
+                .flatMap(Arrays::stream)
+                .forEach(square -> {
+                    if (!isEnemy(square.getPos(), lado) && square.getPiece() instanceof King)
+                        res.set(square.getPos());
+                });
         return res.get();
+    }
+
+    private String getFinalMessage() {
+        if(!clock.isRun())
+            return ((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS";
+        if (detectChecks())
+            return ((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS";
+        else
+            return "STALE MATE";
     }
 
     public void back() {
@@ -113,7 +119,7 @@ public class BoardModel {
         }
     }
 
-    private void colocarPiezas() {
+    private void placePieces() {
         //PAWNS
         for (int i = 0; i < 8; i++) {
             squares[i][6].setPiece(new Pawn(0));
@@ -149,14 +155,9 @@ public class BoardModel {
             return false;
     }
 
-//    private boolean detectCheck(int currentTurn) {
-//
-//        //return JugadasPosibles(currentTurn).Count == 0;
-//    }
-
     private void movePiece() { //se puede llamar a la funion copia
         movePiece(puntero, seleccion);
-        quitarSeleccion();
+        removeSelection();
     }
 
     public void movePiece(Vec2 des, Vec2 ori) {
@@ -188,17 +189,19 @@ public class BoardModel {
         squares[(int) ori.x][(int) ori.y].setPiece(null);
     }
 
-    public void quitarSeleccion() {
-        seleccion = null;
-        squareSelection = null;
-        moves.clear();
+    public void removeSelection() {
+        if (!gameFinished) {
+            seleccion = null;
+            squareSelection = null;
+            moves.clear();
+        }
     }
 
-    public void seleccionar() { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
-        seleccionar(puntero);
+    public void select() { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
+        select(puntero);
     }
 
-    private void seleccionar(Vec2 pos) { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
+    private void select(Vec2 pos) { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
         if (!promoting) {
             //si hay seleccion
             if (seleccion != null && moves.stream().anyMatch(m -> m.equals(pos))) { //si se apunta hacia una casilla que es una jugada
@@ -210,9 +213,8 @@ public class BoardModel {
                 squareSelection = squares[(int) seleccion.x][(int) seleccion.y];  //actualizar la casilla de seleccion
                 if (squareSelection.getPiece() == null               //si la casilla seleccionada esta vacia
                         || squareSelection.getPiece().getLado() != getCurrentTurn())    //o casilla seleccionada no es del color correspondiente
-                    quitarSeleccion();
+                    removeSelection();
             }
-
         } else {    //se elige la pieza de coronacion
             if (Arrays.asList(positions).contains(pos) ||   //la pieza seleccionada este en una de las positions guardadas
                     pos.equals(new Vec2(positions[0].x, positions[0].y * 2 - positions[1].y))) {   //la pieza seleccionada es la reina
@@ -238,23 +240,18 @@ public class BoardModel {
             }
         }
         //update squares color
-        Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(e2 -> {
-                            e2.setPuntero(showPuntero && e2.getPos().equals(puntero));
-                            e2.setSeleccion(e2.getPos().equals(seleccion));
-                            e2.setJugada((e2.getPiece() instanceof King && e2.getPiece().getLado() == getCurrentTurn() && isInCheck(getCurrentTurn()))
-                                    || moves.stream()
-                                    .anyMatch(m -> m.equals(e2.getPos())));
-                        }));
+        Arrays.stream(squares).flatMap(Arrays::stream)
+                .forEach(square -> {
+                    square.setPuntero(showPuntero && square.getPos().equals(puntero));
+                    square.setSeleccion(square.getPos().equals(seleccion));
+                    square.setJugada((square.getPiece() instanceof King && square.getPiece().getLado() == getCurrentTurn() && isInCheck(getCurrentTurn()))
+                            || moves.stream()
+                            .anyMatch(m -> m.equals(square.getPos())));
+                });
         //CHECK STATUS GAME
         if (!promoting && posiblesMoves(getCurrentTurn()).size() == 0) {
-            if (detectChecks())
-                System.out.println(((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS!!!");
-            else
-                System.out.println("STALE MATE");
+            gameFinished = true;
+            message.setMessage(getFinalMessage());
         }
     }
 
@@ -293,83 +290,96 @@ public class BoardModel {
     private Vec2 pawnPromoted() {
         AtomicReference<Vec2> res = new AtomicReference<>();
         Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(square -> {
-                            if (square.getPiece() instanceof Pawn && (square.getPos().y == 0 || square.getPos().y == Constantes.squareNumber - 1))
-                                res.set(square.getPos());
-                        }));
+                .flatMap(Arrays::stream)
+                .forEach(square -> {
+                    if (square.getPiece() instanceof Pawn && (square.getPos().y == 0 || square.getPos().y == Constantes.squareNumber - 1))
+                        res.set(square.getPos());
+                });
         return res.get();
     }
 
     private List<Vec2> posiblesMoves(int lado) {
         List<Vec2> moves = new ArrayList<>();
         Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(square -> {
-                            if (square.getPiece() != null && square.getPiece().getLado() == lado)
-                                moves.addAll(square.getPiece().calculateMoves(this, square.getPos(), true));
-                        }));
+                .flatMap(Arrays::stream).forEach(square -> {
+                    if (square.getPiece() != null && square.getPiece().getLado() == lado)
+                        moves.addAll(square.getPiece().calculateMoves(this, square.getPos(), true));
+                });
         return moves;
     }
 
-    public void seleccionarRaton(Vec2 pos) {
-        seleccionarRaton(pos, true);
+    public void mouseSelect(Vec2 pos) {
+        if (!gameFinished)
+            mouseSelect(pos, true);
     }
 
-    public void seleccionarRaton(Vec2 pos, boolean normal) {
-        if (normal || !promoting) {
+    public void mouseSelect(Vec2 pos, boolean normal) {
+        if (!gameFinished && (normal || !promoting)) {
             showPuntero = false;
             //ajustar posicion raton
             Vec2 posRaton = new Vec2((int) (pos.x / (Constantes.height / Constantes.squareNumber)), (int) (pos.y / (Constantes.height / Constantes.squareNumber)));
             if (isInside(posRaton))
-                seleccionar(posRaton);
+                select(posRaton);
         }
     }
 
     public void onUpdate(double tpf) {
-        if (recordMoves.size() > 1)
-            clock.decreaseTime(tpf, getCurrentTurn());
+        if (!gameFinished && recordMoves.size() > 1 && clock.decreaseTime(tpf, getCurrentTurn())) {
+            gameFinished = true;
+            System.out.println("asdfasdf");
+            message.setMessage(getFinalMessage());
+        }
         updateObservers();
     }
 
+    public void updateObservers() {
+        Arrays.stream(squares).flatMap(Arrays::stream).forEach(Observable::notifyObservers);
+        clock.notifyObservers();
+        message.notifyObservers();
+    }
+
     public void goUp() {
-        showPuntero = true;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
-        if (!promoting && puntero.y > 0
-                || puntero.y > 4 && ladoPromotion == 1
-                || puntero.y > 0 && ladoPromotion == 0)
-            puntero.y--;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        if (!gameFinished) {
+            showPuntero = true;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
+            if (!promoting && puntero.y > 0
+                    || puntero.y > 4 && ladoPromotion == 1
+                    || puntero.y > 0 && ladoPromotion == 0)
+                puntero.y--;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        }
     }
 
     public void goDown() {
-        showPuntero = true;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
-        if (!promoting && puntero.y < Constantes.squareNumber - 1
-                || promoting && puntero.y < Constantes.squareNumber - 1 - 4 && ladoPromotion == 0
-                || promoting && puntero.y < Constantes.squareNumber - 1 && ladoPromotion == 1)
-            puntero.y++;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        if (!gameFinished) {
+            showPuntero = true;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
+            if (!promoting && puntero.y < Constantes.squareNumber - 1
+                    || promoting && puntero.y < Constantes.squareNumber - 1 - 4 && ladoPromotion == 0
+                    || promoting && puntero.y < Constantes.squareNumber - 1 && ladoPromotion == 1)
+                puntero.y++;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        }
     }
 
     public void goLeft() {
-        showPuntero = true;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
-        if (puntero.x > 0 && !promoting)
-            puntero.x--;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        if (!gameFinished) {
+            showPuntero = true;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
+            if (puntero.x > 0 && !promoting)
+                puntero.x--;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        }
     }
 
     public void goRight() {
-        showPuntero = true;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
-        if (puntero.x < Constantes.squareNumber - 1 && !promoting)
-            puntero.x++;
-        squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        if (!gameFinished) {
+            showPuntero = true;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(false);
+            if (puntero.x < Constantes.squareNumber - 1 && !promoting)
+                puntero.x++;
+            squares[(int) puntero.x][(int) puntero.y].setPuntero(true);
+        }
     }
 
     public boolean wasMoved(Vec2 pos) {
@@ -405,13 +415,11 @@ public class BoardModel {
     public boolean isAtacked(Vec2 pos, int lado) {
         List<Vec2> atacks = new ArrayList<Vec2>();
         Arrays.stream(squares)
-                .toList()
-                .forEach(e1 -> Arrays.stream(e1)
-                        .toList()
-                        .forEach(square -> {
-                            if (isEnemy(square.getPos(), lado))
-                                atacks.addAll(square.getPiece().calculateMoves(this, square.getPos(), false));
-                        }));
+                .flatMap(Arrays::stream)
+                .forEach(square -> {
+                    if (isEnemy(square.getPos(), lado))
+                        atacks.addAll(square.getPiece().calculateMoves(this, square.getPos(), false));
+                });
         return atacks.stream().anyMatch(a -> a.equals(pos));
     }
 

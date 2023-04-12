@@ -57,7 +57,7 @@ public class GameController {
         }));
         keys.put(KeyCode.SPACE, new KeyInfo("SPACE", () -> {
             if (mode == 1)
-                boardModel.quitarSeleccion();
+                boardModel.removeSelection();
         }));
         keys.put(KeyCode.ENTER, new KeyInfo("ENTER", () -> {
             if (mode == 0) {
@@ -66,16 +66,16 @@ public class GameController {
                 boardView.setOpacity(false);
                 mode = 1;
             } else if (mode == 1)
-                boardModel.seleccionar();
+                boardModel.select();
         }));
-        keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> {
-            if (mode == 1)
-                boardModel.back();
-        }));
-        keys.put(KeyCode.TAB, new KeyInfo("TAB", () -> {
-            if (mode == 1)
-                boardModel.back();
-        }));
+//        keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> {
+//            if (mode == 1)
+//                boardModel.back();
+//        }));
+//        keys.put(KeyCode.TAB, new KeyInfo("TAB", () -> {
+//            if (mode == 1)
+//                boardModel.back();
+//        }));
     }
 
     private void initGame() {
@@ -83,7 +83,7 @@ public class GameController {
         menuView = new MenuView(menuModel.timeToString());
         menuModel.addObserver(menuView);
         boardModel = new BoardModel(0);
-        boardView = new BoardView(boardModel.getSquare(), boardModel.getClock());
+        boardView = new BoardView(boardModel.getSquare(), boardModel.getClock(), boardModel.getMessage());
     }
 
     private void addInputs() {
@@ -102,18 +102,18 @@ public class GameController {
         input.addAction(new UserAction("PRIMARY") {
             @Override
             protected void onActionBegin() {
-                boardModel.seleccionarRaton(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()));
+                boardModel.mouseSelect(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()));
             }
 
             @Override
             protected void onActionEnd() {
-                boardModel.seleccionarRaton(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()), false);
+                boardModel.mouseSelect(new Vec2(FXGL.getInput().getMousePositionWorld().getX(), FXGL.getInput().getMousePositionWorld().getY()), false);
             }
         }, MouseButton.PRIMARY);
         input.addAction(new UserAction("SECONDARY") {
             @Override
             protected void onActionBegin() {
-                boardModel.quitarSeleccion();
+                boardModel.removeSelection();
             }
         }, MouseButton.SECONDARY);
     }

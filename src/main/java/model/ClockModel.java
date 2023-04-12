@@ -10,6 +10,10 @@ public class ClockModel extends Observable {
         return playersTimes;
     }
 
+    public boolean isRun() {
+        return run;
+    }
+
     public ClockModel(double time) {
         playersTimes = new double[2];
         playersTimes[0] = time;
@@ -23,6 +27,7 @@ public class ClockModel extends Observable {
             setChanged();
         }
         if (playersTimes[lado] <= 0) {
+            playersTimes[lado] = 0;
             stop();
             return true;
         }
@@ -45,7 +50,7 @@ public class ClockModel extends Observable {
         }
     }
 
-    public void stop() {
+    private void stop() {
         run = false;
     }
 }
