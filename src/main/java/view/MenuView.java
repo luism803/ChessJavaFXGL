@@ -35,7 +35,6 @@ public class MenuView implements Observer {
         imageMenu.setFitWidth(Constantes.width);
         imageMenu.setFitHeight(Constantes.height);
         imageMenu.setImage(new Image(Constantes.menuURL));
-
         FXGL.entityBuilder().view(imageMenu).buildAndAttach();
 
         int backgroundWidth = width * 2;
