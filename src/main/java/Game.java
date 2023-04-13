@@ -28,6 +28,8 @@ public class Game extends GameApplication {
     }
 
     public static void main(String[] args) {
+        String currentDirectory = System.getProperty("user.dir");
+        System.out.println("Ruta actual: " + currentDirectory);
         launch(args);
     }
 }
