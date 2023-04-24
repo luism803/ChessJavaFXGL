@@ -15,7 +15,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class MenuView implements Observer {
-    private Rectangle backgroundTime;
     private Rectangle background;
     private Text textTime;
     private ImageView imageMenu;
@@ -39,12 +38,7 @@ public class MenuView implements Observer {
 
         int backgroundWidth = width * 2;
         int backgroudHeight = height * 2;
-        backgroundTime = new Rectangle(backgroundWidth, backgroudHeight, Color.DARKGREEN);
 
-        FXGL.entityBuilder()
-                .view(backgroundTime)
-                .at(Constantes.width / 2 - backgroundWidth / 2, Constantes.height / 2 - backgroudHeight / 2)
-                .buildAndAttach();
         FXGL.entityBuilder()
                 .view(textTime)
                 .at(Constantes.width / 2 - width / 2, Constantes.height / 2 + (3 * height) / 8)
@@ -53,7 +47,6 @@ public class MenuView implements Observer {
 
     public void setOpacity(int opacity) {
         background.setOpacity(opacity);
-        backgroundTime.setOpacity(opacity);
         textTime.setOpacity(opacity);
         imageMenu.setOpacity(opacity);
     }

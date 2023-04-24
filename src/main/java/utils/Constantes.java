@@ -10,7 +10,7 @@ public class Constantes {
     public static final int height = 600;
     public static final int maxTime = (int) (3600 * 0.5);
     public static final String tilesetURL = System.getProperty("user.dir")+"\\src\\main\\resources\\img\\chessTileset.png";
-    public static final String menuURL = System.getProperty("user.dir")+"\\src\\main\\resources\\img\\menu1.png";
+    public static final String menuURL = System.getProperty("user.dir")+"\\src\\main\\resources\\img\\menu.png";
     public static final int heightClock = 2 * height / 7;
 
     public static WritableImage getTile(int x, int y) {

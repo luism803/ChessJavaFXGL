@@ -9,6 +9,7 @@ public class Game extends GameApplication {
 
     @Override
     protected void initSettings(GameSettings settings) {
+        settings.setTitle("Chess");
         settings.setWidth(Constantes.width);
         settings.setHeight(Constantes.height);
         settings.setTicksPerSecond(60);
