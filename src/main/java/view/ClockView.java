@@ -11,10 +11,17 @@ import utils.Constantes;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * Class ClockView
+ */
 public class ClockView implements Observer {
     private Text timePlayer0;
     private Text timePlayer1;
 
+    /**
+     * Constructor for ClockView
+     * @param time Time to display for both players
+     */
     public ClockView(String time) {
         timePlayer1 = new Text(time);
         timePlayer1.setFont(Font.font("Arial", FontWeight.BOLD, 30));
@@ -34,6 +41,12 @@ public class ClockView implements Observer {
                 .buildAndAttach();
     }
 
+    /**
+     * Update the clock view
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable o, Object arg) {
         ClockModel model = (ClockModel) o;
@@ -41,6 +54,10 @@ public class ClockView implements Observer {
         timePlayer1.setText(model.timeToString(1));
     }
 
+    /**
+     * Set the opacity of the clock
+     * @param opacity Opacity of the clock (0 = transparent, 1 = opaque)
+     */
     public void setOpacity(int opacity) {
         timePlayer0.setOpacity(opacity);
         timePlayer1.setOpacity(opacity);

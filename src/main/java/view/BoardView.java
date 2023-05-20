@@ -8,11 +8,20 @@ import utils.Constantes;
 
 import java.util.Arrays;
 
+/**
+ * Class BoardView
+ */
 public class BoardView {
     private SquareView[][] squareViews;
     private ClockView clockView;
     private MessageView messageView;
 
+    /**
+     * Constructor for BoardView
+     * @param squareModels Bidimensional array of square models
+     * @param clockModel Clock model
+     * @param messageModel Message model
+     */
     public BoardView(SquareModel[][] squareModels, ClockModel clockModel, MessageModel messageModel) {
         squareViews = new SquareView[Constantes.squareNumber][Constantes.squareNumber];
         Color blanca = Color.web("rgb(250,220,175)");
@@ -32,11 +41,19 @@ public class BoardView {
         messageModel.addObserver(messageView);
     }
 
+    /**
+     * Set the opacity of the board
+     * @param opacity Opacity of the board (0 = transparent, 1 = opaque)
+     */
     public void setOpacity(int opacity) {
         Arrays.stream(squareViews).flatMap(Arrays::stream).forEach(square -> square.setOpacity(opacity));
         clockView.setOpacity(opacity);
     }
 
+    /**
+     * Set the opacity of the board
+     * @param opacity Opacity of the board (true = 0, false = 1)
+     */
     public void setOpacity(boolean opacity) {
         setOpacity(opacity ? 0 : 1);
     }

@@ -10,7 +10,9 @@ import utils.Constantes;
 
 import java.util.Observable;
 import java.util.Observer;
-
+/**
+ * Class SquareView
+ */
 public class SquareView implements Observer {
     static Color punteroColor = Color.web("rgb(20, 160, 20)", 1.0);
     static Color jugadaColor = Color.web("rgb(130, 200, 255)", 0.75);
@@ -19,7 +21,13 @@ public class SquareView implements Observer {
     private Rectangle rectFiltro;
     private Rectangle rectBase;
     private ImageView image;
-
+    /**
+     * Constructor for SquareView
+     * @param x X position of the square
+     * @param y Y position of the square
+     * @param size Size of the square
+     * @param baseColor Color of the square
+     */
     public SquareView(double x, double y, double size, Color baseColor) {
         x *= size;
         y *= size;
@@ -32,11 +40,20 @@ public class SquareView implements Observer {
         FXGL.entityBuilder().at(x, y).view(rectFiltro).buildAndAttach();
         FXGL.entityBuilder().at(x, y).view(image).buildAndAttach();
     }
-
+    /**
+     * Set the image of the piece
+     * @param pieceImage Image of the piece
+     */
     public void setPieceImage(Image pieceImage) {
         image.setImage(pieceImage);
     }
 
+    /**
+     * Set the opacity of the square
+     * @param o     the observable object.
+     * @param arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
     @Override
     public void update(Observable o, Object arg) {
         SquareModel model = (SquareModel) o;
@@ -51,7 +68,10 @@ public class SquareView implements Observer {
             image.setImage(Constantes.getTile(model.getPiece().getPieza(), model.getPiece().getLado()));
         else image.setImage(null);
     }
-
+    /**
+     * Set the opacity of the square
+     * @param opacity Opacity of the square (0 = transparent, 1 = opaque)
+     */
     public void setOpacity(int opacity) {
         rectBase.setOpacity(opacity);
         rectFiltro.setOpacity(opacity);

@@ -5,11 +5,25 @@ import model.BoardModel;
 
 import java.util.List;
 
+/**
+ * Class King
+ */
 public class King extends Piece {
+    /**
+     * Constructor for King
+     * @param l Side of the piece
+     */
     public King(int l) {
         super(0, l);
     }
 
+    /**
+     * Calculate the possible moves of the piece
+     * @param board Board of the game
+     * @param pos Position of the piece
+     * @param check Check if the king is in check after the move
+     * @return List of possible moves
+     */
     @Override
     public List<Vec2> calculateMoves(BoardModel board, Vec2 pos, boolean check) {
         moves.clear();
@@ -28,6 +42,11 @@ public class King extends Piece {
         return moves;
     }
 
+    /**
+     * Add the castling move if it's possible
+     * @param board Board of the game
+     * @param pos Position of the piece
+     */
     private void addCastling(BoardModel board, Vec2 pos) {
         if (lado == 0 && pos.y == 7 || lado == 1 && pos.y == 0) {
             Vec2 pos1 = new Vec2(pos.x + 1, pos.y);
@@ -48,6 +67,10 @@ public class King extends Piece {
         }
     }
 
+    /**
+     * Copy the piece
+     * @return Copy of the piece
+     */
     @Override
     public Piece copy() {
         return new King(lado);

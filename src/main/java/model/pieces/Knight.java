@@ -5,11 +5,24 @@ import model.BoardModel;
 
 import java.util.List;
 
+/**
+ * Class Knight
+ */
 public class Knight extends Piece {
+    /**
+     * Constructor for Knight
+     * @param l Side of the piece
+     */
     public Knight(int l) {
         super(3, l);
     }
-
+    /**
+     * Calculate the possible moves of the piece
+     * @param board Board of the game
+     * @param pos Position of the piece
+     * @param check Check if the king is in check after the move
+     * @return List of possible moves
+     */
     @Override
     public List<Vec2> calculateMoves(BoardModel board, Vec2 pos, boolean check) {
         moves.clear();
@@ -26,6 +39,10 @@ public class Knight extends Piece {
         return moves;
     }
 
+    /**
+     * Copy the piece
+     * @return Copy of the piece
+     */
     @Override
     public Piece copy() {
         return new Knight(lado);

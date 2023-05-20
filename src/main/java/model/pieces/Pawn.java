@@ -5,14 +5,27 @@ import model.BoardModel;
 
 import java.util.List;
 
+/**
+ * Class Pawn
+ */
 public class Pawn extends Piece {
 
-
+    /**
+     * Constructor for Pawn
+     * @param l Side of the piece
+     */
     public Pawn(int l) {
         super(5, l);
 
     }
 
+    /**
+     * Calculate the possible moves of the piece
+     * @param board Board of the game
+     * @param pos Position of the piece
+     * @param check Check if the king is in check after the move
+     * @return List of possible moves
+     */
     @Override
     public List<Vec2> calculateMoves(BoardModel board, Vec2 pos, boolean check) {
         moves.clear();
@@ -36,6 +49,12 @@ public class Pawn extends Piece {
         return moves;
     }
 
+    /**
+     * Add a move to the list of possible moves
+     * @param board Board of the game
+     * @param pos Position of the move
+     * @return True if the move is valid
+     */
     @Override
     protected boolean addMove(BoardModel board, Vec2 pos) {
         if (board.isEmpty(pos))
@@ -43,6 +62,11 @@ public class Pawn extends Piece {
         return board.isEmpty(pos);
     }
 
+    /**
+     * Add an attack to the list of possible moves
+     * @param board Board of the game
+     * @param pos Position of the attack
+     */
     private void addAttack(BoardModel board, Vec2 pos) {
         if (board.isEnemy(pos, lado))
             moves.add(pos.copy());
@@ -58,6 +82,10 @@ public class Pawn extends Piece {
         }
     }
 
+    /**
+     * Copy the piece
+     * @return Copy of the piece
+     */
     @Override
     public Piece copy() {
         return new Pawn(lado);

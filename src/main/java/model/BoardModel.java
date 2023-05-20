@@ -10,7 +10,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.atomic.AtomicReference;
-
+/**
+ * Class BoardModel
+ * Model of the board
+ */
 public class BoardModel {
     private boolean promoting;
     private boolean showPuntero;
@@ -27,6 +30,11 @@ public class BoardModel {
     private ClockModel clock;
     private MessageModel message;
 
+    /**
+     * Constructor
+     * @param puntero Position of pointer
+     * @param time Time of the game
+     */
     public BoardModel(Vec2 puntero, double time) {
         this.puntero = puntero;
         showPuntero = true;
@@ -50,18 +58,34 @@ public class BoardModel {
         placePieces();
     }
 
+    /**
+     * Constructor
+     * @param time Time of the game
+     */
     public BoardModel(double time) {
         this(new Vec2(), time);
     }
 
+    /**
+     * Getter of square models of the board
+     * @return Bidimensional array of square models
+     */
     public SquareModel[][] getSquare() {
         return squares;
     }
 
+    /**
+     * Getter for clock model of the board
+     * @return Clock model
+     */
     public ClockModel getClock() {
         return clock;
     }
 
+    /**
+     * Getter for the side's turn
+     * @return 0 if it is white's turn, 1 if it is black's turn
+     */
     private int getCurrentTurn() {
         if (promoting) {
             return ladoPromotion;
@@ -69,10 +93,19 @@ public class BoardModel {
         return (recordMoves.size() == 0 || recordMoves.get(recordMoves.size() - 1).getPieceOri().getLado() == 1) ? 0 : 1;
     }
 
+    /**
+     * Getter for the message model of the board
+     * @return Message model
+     */
     public MessageModel getMessage() {
         return message;
     }
 
+    /**
+     * Getter for the position of the king's square
+     * @param lado Side of the king
+     * @return Position of the king
+     */
     private Vec2 getKing(int lado) {
         AtomicReference<Vec2> res = new AtomicReference<>();
         Arrays.stream(squares)
@@ -84,6 +117,10 @@ public class BoardModel {
         return res.get();
     }
 
+    /**
+     * Getter for the message when the game is finished
+     * @return Message of finished game
+     */
     private String getFinalMessage() {
         if (!clock.isRun())
             return ((getCurrentTurn() == 0) ? "BLACK" : "WHITE") + " WINS";
@@ -93,6 +130,9 @@ public class BoardModel {
             return "STALE MATE";
     }
 
+    /**
+     * Undo the last move
+     */
     public void back() {
         if (!promoting && recordMoves.size() > 0) {
             RecordMove lastRecord = recordMoves.get(recordMoves.size() - 1);
@@ -119,6 +159,9 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Place the pieces in the board
+     */
     private void placePieces() {
         //PAWNS
         for (int i = 0; i < 8; i++) {
@@ -148,18 +191,29 @@ public class BoardModel {
         squares[4][0].setPiece(new King(1));
     }
 
+    /**
+     * Check if one of the kings is in check
+     * @return True if one of the kings is in check, false otherwise
+     */
     private boolean detectChecks() {
         if (!promoting) {
             return isInCheck(getCurrentTurn());
         } else
             return false;
     }
-
+    /**
+     * Move the piece selected to the square selected
+     */
     private void movePiece() { //se puede llamar a la funion copia
         movePiece(puntero, seleccion);
         removeSelection();
     }
 
+    /**
+     * Move the piece of the square (ori) to the square (des)
+     * @param des Destination square
+     * @param ori Origin square
+     */
     public void movePiece(Vec2 des, Vec2 ori) {
         //GUARDAR JUGADA EN EL REGISTRO
         Piece pieceOri = null;
@@ -189,6 +243,9 @@ public class BoardModel {
         squares[(int) ori.x][(int) ori.y].setPiece(null);
     }
 
+    /**
+     * Remove the selection
+     */
     public void removeSelection() {
         if (!gameFinished) {
             seleccion = null;
@@ -197,11 +254,19 @@ public class BoardModel {
         }
     }
 
-    public void select() { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
+    /**
+     * Select the square pointed by the pointer
+     * if there is a selection, move the piece to the square pointed by the pointer
+     */
+    public void select() {
         select(puntero);
     }
 
-    private void select(Vec2 pos) { //FALTA CREAR UNA SOBRECARGA QUE RECIBA EL PUNTERO (Vec2) si se mete jugar con el raton
+    /**
+     * Select the square pos, if there is a selection move the piece to the square pos
+     * @param pos Position of the square to select
+     */
+    private void select(Vec2 pos) {
         if (!promoting) {
             //si hay seleccion
             if (seleccion != null && moves.stream().anyMatch(m -> m.equals(pos))) { //si se apunta hacia una casilla que es una jugada
@@ -256,6 +321,10 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Show the pieces that can be promoted
+     * @param pawnPromoted Position of the pawn to be promoted
+     */
     private void elegirCoronacion(Vec2 pawnPromoted) {
         ladoPromotion = 0;
         //blancas
@@ -288,6 +357,10 @@ public class BoardModel {
         moves.add(positions[2]);
     }
 
+    /**
+     * Return the position of the pawn to be promoted
+     * @return Position of the pawn to be promoted
+     */
     private Vec2 pawnPromoted() {
         AtomicReference<Vec2> res = new AtomicReference<>();
         Arrays.stream(squares)
@@ -299,6 +372,11 @@ public class BoardModel {
         return res.get();
     }
 
+    /**
+     * Return the possible moves of the side
+     * @param lado
+     * @return List of possible moves
+     */
     private List<Vec2> posiblesMoves(int lado) {
         List<Vec2> moves = new ArrayList<>();
         Arrays.stream(squares)
@@ -309,11 +387,20 @@ public class BoardModel {
         return moves;
     }
 
+    /**
+     * Select using the position of the mouse if the game is not finished
+     * @param pos Position of the mouse
+     */
     public void mouseSelect(Vec2 pos) {
         if (!gameFinished)
             mouseSelect(pos, true);
     }
 
+    /**
+     * Select using the position of the mouse if the game is not finished
+     * @param pos Position of the mouse
+     * @param normal If the selection is normal or not
+     */
     public void mouseSelect(Vec2 pos, boolean normal) {
         if (!gameFinished && (normal || !promoting)) {
             showPuntero = false;
@@ -324,6 +411,10 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Update the game
+     * @param tpf Time per frame
+     */
     public void onUpdate(double tpf) {
         if (!gameFinished && recordMoves.size() > 1 && clock.decreaseTime(tpf, getCurrentTurn())) {
             gameFinished = true;
@@ -332,12 +423,18 @@ public class BoardModel {
         updateObservers();
     }
 
+    /**
+     * Update the observers of the board (squares, clock and message)
+     */
     public void updateObservers() {
         Arrays.stream(squares).flatMap(Arrays::stream).forEach(Observable::notifyObservers);
         clock.notifyObservers();
         message.notifyObservers();
     }
 
+    /**
+     * Move the pointer up
+     */
     public void goUp() {
         if (!gameFinished) {
             showPuntero = true;
@@ -350,6 +447,9 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Move the pointer down
+     */
     public void goDown() {
         if (!gameFinished) {
             showPuntero = true;
@@ -362,6 +462,9 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Move the pointer to the left
+     */
     public void goLeft() {
         if (!gameFinished) {
             showPuntero = true;
@@ -372,6 +475,9 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Move the pointer to the right
+     */
     public void goRight() {
         if (!gameFinished) {
             showPuntero = true;
@@ -382,36 +488,79 @@ public class BoardModel {
         }
     }
 
+    /**
+     * Check if a square was moved
+     * @param pos Position of the square
+     * @return If the square was moved
+     */
     public boolean wasMoved(Vec2 pos) {
         return recordMoves.stream().anyMatch(r -> r.getOri().equals(pos));
     }
 
+    /**
+     * Check if a position is inside the board
+     * @param pos Position
+     * @return If the position is inside the board
+     */
     private boolean isInside(Vec2 pos) {
         return pos.x >= 0 && pos.x <= Constantes.squareNumber - 1 &&
                 pos.y >= 0 && pos.y <= Constantes.squareNumber - 1;
     }
 
+    /**
+     * Check if a square's piece is a pawn
+     * @param pos Position of the square
+     * @return If the square's piece is a pawn
+     */
     public boolean isPeon(Vec2 pos) {
         return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() instanceof Pawn;
     }
 
+    /**
+     * Check if a square is empty
+     * @param pos Position of the square
+     * @return If the square is empty
+     */
     public boolean isEmpty(Vec2 pos) {
         return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() == null;
     }
 
+    /**
+     * Check if a square's piece is an enemy
+     * @param pos Position of the square
+     * @param lado Side of the piece
+     * @return
+     */
     public boolean isEnemy(Vec2 pos, int lado) {
         return isInside(pos) && squares[(int) pos.x][(int) pos.y].getPiece() != null &&
                 squares[(int) pos.x][(int) pos.y].getPiece().getLado() != lado;
     }
 
+    /**
+     * Check if a side is in check
+     * @param lado Side
+     * @return
+     */
     public boolean isInCheck(int lado) {
         return isAtacked(getKing(lado), lado);
     }
 
+    /**
+     * Check if position origin and the position destination are the last move
+     * @param origin Origin
+     * @param destination Destination
+     * @return If the position origin and the position destination are the last move
+     */
     public boolean isLastJugada(Vec2 origin, Vec2 destination) {
         return recordMoves.get(recordMoves.size() - 1).getOri().equals(origin) && recordMoves.get(recordMoves.size() - 1).getDes().equals(destination);
     }
 
+    /**
+     * Check if a position is in attacked by an enemy
+     * @param pos Position
+     * @param lado Side of the piece
+     * @return If a position is in attacked by an enemy
+     */
     public boolean isAtacked(Vec2 pos, int lado) {
         List<Vec2> atacks = new ArrayList<Vec2>();
         Arrays.stream(squares)
@@ -423,6 +572,10 @@ public class BoardModel {
         return atacks.stream().anyMatch(a -> a.equals(pos));
     }
 
+    /**
+     * Setter of the clock time
+     * @param time Time
+     */
     public void setTime(int time) {
         clock.setTime(time);
     }

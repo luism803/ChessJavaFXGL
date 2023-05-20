@@ -16,6 +16,9 @@ import view.MenuView;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class GameController
+ */
 public class GameController {
     private BoardModel boardModel;
     private BoardView boardView;
@@ -25,6 +28,9 @@ public class GameController {
     private int mode;
     private int time;
 
+    /**
+     * Constructor for GameController
+     */
     public GameController() {
         mode = 0;
         addControls();
@@ -33,6 +39,9 @@ public class GameController {
         boardView.setOpacity(true);
     }
 
+    /**
+     * Add controls to the game
+     */
     private void addControls() {
         keys = new HashMap<KeyCode, KeyInfo>();
         keys.put(KeyCode.LEFT, new KeyInfo("LEFT", () -> {
@@ -68,17 +77,11 @@ public class GameController {
             } else if (mode == 1)
                 boardModel.select();
         }));
-
-//        keys.put(KeyCode.BACK_SPACE, new KeyInfo("BACK_SPACE", () -> {
-//            if (mode == 1)
-//                boardModel.back();
-//        }));
-//        keys.put(KeyCode.TAB, new KeyInfo("TAB", () -> {
-//            if (mode == 1)
-//                boardModel.back();
-//        }));
     }
 
+    /**
+     * Initialize the game
+     */
     private void initGame() {
         menuModel = new MenuModel(180);
         menuView = new MenuView(menuModel.timeToString());
@@ -86,7 +89,9 @@ public class GameController {
         boardModel = new BoardModel(0);
         boardView = new BoardView(boardModel.getSquare(), boardModel.getClock(), boardModel.getMessage());
     }
-
+    /**
+     * Add inputs to the game
+     */
     private void addInputs() {
         Input input = FXGL.getInput();
         keys.forEach((code, info) ->
@@ -119,6 +124,10 @@ public class GameController {
         }, MouseButton.SECONDARY);
     }
 
+    /**
+     * Update the game
+     * @param tpf Time per frame
+     */
     public void onUpdate(double tpf) {
         keys.forEach((code, info) -> {
                     if (info.getCooldown() > 0)

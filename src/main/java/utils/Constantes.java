@@ -3,6 +3,9 @@ package utils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 
+/**
+ * Class Constants
+ */
 public class Constantes {
     public static final int squareNumber = 8;
     public static final double cooldown = 0.15;
@@ -13,6 +16,12 @@ public class Constantes {
     public static final String menuURL = System.getProperty("user.dir")+"\\src\\main\\resources\\img\\menu.png";
     public static final int heightClock = 2 * height / 7;
 
+    /**
+     * Get a tile from the tileset
+     * @param x X position of the tile
+     * @param y Y position of the tile
+     * @return Tile
+     */
     public static WritableImage getTile(int x, int y) {
         Image tileset = new Image(Constantes.tilesetURL);
 
